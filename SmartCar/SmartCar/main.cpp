@@ -8,7 +8,10 @@ int main() {
 
 	uSensor.setUp();
 
-	uSensor.start();
+	while (1)
+	{
+		uSensor.start();
+	}
 
 	return 0;
 }

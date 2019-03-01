@@ -43,6 +43,6 @@ void Ultrasonic::start() {
 
 	if (distance <= 20)
 	{
-		cout << "STOP";
+		cout << "STOP\n";
 	}
 }
