@@ -20,6 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Ultrasonic.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Ultrasonic.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SmartCar.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F7CF9DA9-8E90-44FC-8AD9-130753D970AF}</ProjectGuid>
