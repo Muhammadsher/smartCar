@@ -11,8 +11,8 @@ int Ultrasonic::setUp() {
 	if (wiringPiSetup() == -1)
 		return 0;
 	else {
-		pinmode(TRIG_PIN, OUTPUT);
-		pinmode(ECHO_PIN, INPUT);
+		pinMode(TRIG_PIN, OUTPUT);
+		pinMode(ECHO_PIN, INPUT);
 	}
 	return 0;
 }
