@@ -2,14 +2,17 @@
 #include <iostream>
 #include <wiringPi.h>
 
+#define TRIG_PIN 28
+#define ECHO_PIN 29
+
 using namespace std;
 
 int Ultrasonic::setUp() {
-	if (wiringpisetup() == -1)
+	if (wiringPiSetup() == -1)
 		return 0;
 	else {
-		pinmode(trig_pin, output);
-		pinmode(echo_pin, input);
+		pinmode(TRIG_PIN, OUTPUT);
+		pinmode(ECHO_PIN, INPUT);
 	}
 	return 0;
 }
