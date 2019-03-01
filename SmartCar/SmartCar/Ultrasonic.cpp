@@ -2,14 +2,17 @@
 #include <iostream>
 #include <wiringPi.h>
 
+#define TRIG_PIN 28
+#define ECHO_PIN 29
+
 using namespace std;
 
 int Ultrasonic::setUp() {
-	if (wiringpisetup() == -1)
+	if (wiringPiSetup() == -1)
 		return 0;
 	else {
-		pinmode(trig_pin, output);
-		pinmode(echo_pin, input);
+		pinMode(TRIG_PIN, OUTPUT);
+		pinMode(ECHO_PIN, INPUT);
 	}
 	return 0;
 }
@@ -40,6 +43,6 @@ void Ultrasonic::start() {
 
 	if (distance <= 20)
 	{
-		cout << "STOP";
+		cout << "STOP\n";
 	}
 }
