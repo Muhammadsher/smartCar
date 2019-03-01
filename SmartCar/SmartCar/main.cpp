@@ -1,12 +1,14 @@
-#include <iostream>
 #include "Ultrasonic.h"
+#include <iostream>
 
 using namespace std;
 
-
 int main() {
-	
+	Ultrasonic uSensor;
 
+	uSensor.setUp();
 
-	return 0;	
+	uSensor.start();
+
+	return 0;
 }

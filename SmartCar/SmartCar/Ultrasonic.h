@@ -11,6 +11,8 @@ public:
 
 	int setUp();
 	void start();
+
+private:
 	int getDistance();
 };
 

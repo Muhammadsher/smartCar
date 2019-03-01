@@ -1,18 +1,22 @@
 #include "Ultrasonic.h"
+#include <iostream>
+#include <wiringPi.h>
+
+using namespace std;
 
 int Ultrasonic::setUp() {
-	//if (wiringPiSetup() == -1)
-	//	return 0;
-	//else {
-	//	//pinMode(TRIG_PIN, OUTPUT);
-	//	//pinMode(ECHO_PIN, INPUT);
-	//}
+	if (wiringpisetup() == -1)
+		return 0;
+	else {
+		pinmode(trig_pin, output);
+		pinmode(echo_pin, input);
+	}
 	return 0;
 }
 
 int Ultrasonic::getDistance()
 {
-	/*int start_time = 0, end_time = 0;
+	int start_time = 0, end_time = 0;
 	float distance = 0;
 
 	digitalWrite(TRIG_PIN, LOW);
@@ -28,15 +32,14 @@ int Ultrasonic::getDistance()
 	end_time = micros();
 
 	distance = (end_time - start_time) / 29. / 2.;
-	return (int)distance;*/
-	return 1;
+	return (int)distance;
 }
 
 void Ultrasonic::start() {
-	/*int distance = getDistance();
+	int distance = getDistance();
 
 	if (distance <= 20)
 	{
-	printf("STOP");
-	}*/
+		cout << "STOP";
+	}
 }
