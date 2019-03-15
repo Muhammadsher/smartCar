@@ -38,11 +38,15 @@ int Ultrasonic::getDistance()
 	return (int)distance;
 }
 
-void Ultrasonic::start() {
+bool Ultrasonic::start() {
 	int distance = getDistance();
 
 	if (distance <= 20)
 	{
-		cout << "STOP\n";
+		return false;
+	}
+	else 
+	{
+		return true;
 	}
 }
