@@ -10,7 +10,7 @@ public:
 	}
 
 	int setUp();
-	void start();
+	bool start();
 
 private:
 	int getDistance();
