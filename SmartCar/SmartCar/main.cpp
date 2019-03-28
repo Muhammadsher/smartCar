@@ -18,20 +18,36 @@ int main() {
 	while (1)
 	{
 
-		if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // obstacle everywhere
+		if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // obstacle everywhere 000 - 0
 		{
 			motor.stopDCMotor();
 			break;
 		}
-		else if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 1) // no obstacle in left side
+		else if (uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // no obstacle in any side 100 - 4
+		{
+			motor.goForward();
+		}
+		else if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 1) // no obstacle in left side 001 - 1
 		{
 			motor.goLeft();
 		}
-		else if (!uSensor.start() && ir.RightIr() == 1 && ir.LeftIr() == 0) // no obstacle in right side
+		else if (!uSensor.start() && ir.RightIr() == 1 && ir.LeftIr() == 0) // no obstacle in right side 010 - 2
 		{
 			motor.goRight();
 		}
-		else if (uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // no obstacle in left side
+		else if (uSensor.start() && ir.RightIr() == 1 && ir.LeftIr() == 1) // no obstacle in right and left side 011 - 3
+		{
+			motor.stopDCMotor();
+		}
+		else if (uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 1) // no obstacle in left side 101 - 5
+		{
+			motor.goLeft();
+		}
+		else if (uSensor.start() && ir.RightIr() == 1 && ir.LeftIr() == 0) // no obstacle in right side 110 - 6
+		{
+			motor.goRight();
+		}
+		else if (uSensor.start() && ir.RightIr() == 1 && ir.LeftIr() == 1) // no obstacle 111 - 7
 		{
 			motor.goForward();
 		}
