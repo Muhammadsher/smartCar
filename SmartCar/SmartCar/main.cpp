@@ -23,9 +23,9 @@ int main() {
 			motor.stopDCMotor();
 			break;
 		}
-		else if (uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // no obstacle in any side 100 - 4
+		else if (uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // obstacle in right and left side 100 - 4
 		{
-			motor.goForward();
+			motor.stopDCMotor();
 		}
 		else if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 1) // no obstacle in left side 001 - 1
 		{
@@ -37,7 +37,7 @@ int main() {
 		}
 		else if (uSensor.start() && ir.RightIr() == 1 && ir.LeftIr() == 1) // no obstacle in right and left side 011 - 3
 		{
-			motor.stopDCMotor();
+			motor.goForward();
 		}
 		else if (uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 1) // no obstacle in left side 101 - 5
 		{
