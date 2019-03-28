@@ -17,23 +17,23 @@ int main() {
 
 	while (1)
 	{
-		if (uSensor.start()) {
-			motor.goForward();
+
+		if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // obstacle everywhere
+		{
+			motor.stopDCMotor();
+			break;
 		}
-		
-		if(ir.RightIr() == 0)
+		else if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 1) // no obstacle in left side
 		{
 			motor.goLeft();
 		}
-		
-		if (ir.LeftIr() == 0)
+		else if (!uSensor.start() && ir.RightIr() == 1 && ir.LeftIr() == 0) // no obstacle in right side
 		{
 			motor.goRight();
 		}
-
-		if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0)
+		else if (uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // no obstacle in left side
 		{
-			motor.stopDCMotor();
+			motor.goForward();
 		}
 
 	}
