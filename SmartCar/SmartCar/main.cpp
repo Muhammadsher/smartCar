@@ -21,7 +21,7 @@ int main() {
 		int rightBit = ir.RightIr();
 		int leftBit = ir.LeftIr();
 		
-		//motor.allInOne(rightBit, (leftBit & ~rightBit), leftBit, (rightBit & ~leftBit));
+		motor.allInOne(rightBit, (leftBit & ~rightBit), leftBit, (rightBit & ~leftBit));
 
 		if (!uSensor.start())
 		{
