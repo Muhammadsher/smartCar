@@ -23,6 +23,11 @@ int main() {
 		
 		motor.allInOne(rightBit, (leftBit & ~rightBit), leftBit, (rightBit & ~leftBit));
 
+		if (!uSensor.start())
+		{
+			motor.allInOne(0,0,0,0);
+		}
+
 		//if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // obstacle everywhere 000 - 0
 		//{
 		//	motor.stopDCMotor();
