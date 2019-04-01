@@ -21,11 +21,14 @@ int main() {
 		int rightBit = ir.RightIr();
 		int leftBit = ir.LeftIr();
 		
-		motor.allInOne(rightBit, (leftBit & ~rightBit), leftBit, (rightBit & ~leftBit));
 
 		if (!uSensor.start())
 		{
 			motor.stopDCMotor();
+		}
+		else 
+		{
+			motor.allInOne(rightBit, (leftBit & ~rightBit), leftBit, (rightBit & ~leftBit));
 		}
 
 		//if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // obstacle everywhere 000 - 0
