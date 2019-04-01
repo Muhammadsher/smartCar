@@ -19,7 +19,7 @@ int main() {
 	{
 
 		
-		motor.allInOne(ir.RightIr, (ir.LeftIr & !ir.RightIr), ir.LeftIr, (ir.RightIr & !ir.LeftIr));
+		motor.allInOne(ir.RightIr, (ir.LeftIr & ~ir.RightIr), ir.LeftIr, (ir.RightIr & ~ir.LeftIr));
 
 		//if (!uSensor.start() && ir.RightIr() == 0 && ir.LeftIr() == 0) // obstacle everywhere 000 - 0
 		//{
