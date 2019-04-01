@@ -41,7 +41,7 @@ int Ultrasonic::getDistance()
 bool Ultrasonic::start() {
 	int distance = getDistance();
 
-	if (distance <= 20)
+	if (distance <= 30)
 	{
 		return false;
 	}
