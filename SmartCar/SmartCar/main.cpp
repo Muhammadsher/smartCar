@@ -32,7 +32,10 @@ int main() {
 		int tracerRight = tracer.rightIrTracer();
 		int tracerLeft = tracer.leftIrTracer();
 
-		motor.control(tracerRight, (tracerLeft & ~tracerRight), tracerLeft, (tracerRight & ~tracerLeft));
+		int controlRight = IrRightBit | tracerRight;
+		int controlLeft = IrLeftBit | tracerLeft;
+
+		motor.control(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft));
 
 		//motor.control(IrRightBit, (IrLeftBit  & ~IrRightBit), IrLeftBit, (IrRightBit & ~IrLeftBit));
 
