@@ -32,9 +32,9 @@ int main() {
 		int tracerRight = tracer.rightIrTracer();
 		int tracerLeft = tracer.leftIrTracer();
 
+		motor.control(tracerRight, (tracerLeft & ~tracerRight), tracerLeft, (tracerRight & ~tracerLeft));
 
-		motor.control(IrRightBit | tracerRight, ((IrLeftBit | tracerLeft) & ~(IrRightBit | tracerRight)), IrLeftBit | tracerLeft,
-			((IrRightBit | tracerRight) & ~(IrLeftBit | tracerLeft)));
+		//motor.control(IrRightBit, (IrLeftBit  & ~IrRightBit), IrLeftBit, (IrRightBit & ~IrLeftBit));
 
 		/*if (!uSensor.start())
 		{
