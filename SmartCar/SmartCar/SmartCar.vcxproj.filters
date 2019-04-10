@@ -27,6 +27,9 @@
     <ClCompile Include="IR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IR_Tracer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -39,6 +42,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IR_Tracer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

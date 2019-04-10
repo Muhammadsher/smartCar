@@ -13,7 +13,7 @@ public:
 	}
 
 	void initDCMotor();
-	void allInOne(int p1, int p4, int p5, int p6);
+	void control(int p1, int p4, int p5, int p6);
 	void goForward(int);
 	void goBackward(int);
 	void goLeft(int);

@@ -20,12 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IR.cpp" />
+    <ClCompile Include="IR_Tracer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Motor.cpp" />
     <ClCompile Include="Ultrasonic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IR.h" />
+    <ClInclude Include="IR_Tracer.h" />
     <ClInclude Include="Motor.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Ultrasonic.h" />
