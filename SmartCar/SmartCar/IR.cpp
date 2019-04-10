@@ -8,12 +8,8 @@
 using namespace std;
 
 int IR::setUp() {
-	if (wiringPiSetup() == -1)
-		return 0;
-	else {
-		pinMode(RIGHT, INPUT);
-		pinMode(LEFT, INPUT);
-	}
+	pinMode(RIGHT, INPUT);
+	pinMode(LEFT, INPUT);
 	return 0;
 }
 

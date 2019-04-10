@@ -44,7 +44,7 @@ int Motor::checkSpeed(int speed) {
 	return speed;
 }
 
-void Motor::allInOne(int p1, int p4, int p5, int p6)
+void Motor::control(int p1, int p4, int p5, int p6)
 {
 	digitalWrite(IN1_PIN, p1);
 	digitalWrite(IN2_PIN, p4);
