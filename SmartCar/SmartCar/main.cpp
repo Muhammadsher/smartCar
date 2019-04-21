@@ -1,10 +1,13 @@
 #include "IR.h"
 #include "IR_Tracer.h"
 #include "Motor.h"
+#include "LaneTracerCam.h"
 #include <wiringPi.h>
 #include <iostream>
 #include <thread>
 #include <atomic>
+
+using namespace std;
 
 #define TRIG_PIN 28
 #define ECHO_PIN 29
@@ -38,7 +41,6 @@ void getDistance() {
 		distance = (end_time - start_time) / 29. / 2.;
 
 		stopBit = (distance > 35);
-		cout << "Distance: " << distance << endl;
 	}
 }
 
@@ -46,6 +48,8 @@ int main() {
 	Motor motor;
 	IR_Tracer tracer;
 	IR ir;
+	LaneTracerCam laneTracerCam;
+	
 
 	if (wiringPiSetup() == -1) {
 		cout << "Setup wiringPi failed !" << endl;
@@ -66,6 +70,7 @@ int main() {
 
 		motor.control(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft));
 
+		laneTracerCam.trace(motor);
 
 	}
 
