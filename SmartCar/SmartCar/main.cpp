@@ -1,7 +1,7 @@
 #include "IR.h"
 #include "IR_Tracer.h"
 #include "Motor.h"
-#include "LaneTracerCam.h"
+//#include "LaneTracerCam.h"
 #include <wiringPi.h>
 #include <iostream>
 #include <thread>
@@ -48,7 +48,7 @@ int main() {
 	Motor motor;
 	IR_Tracer tracer;
 	IR ir;
-	LaneTracerCam laneTracerCam;
+	//LaneTracerCam laneTracerCam;
 	
 
 	if (wiringPiSetup() == -1) {
@@ -56,7 +56,8 @@ int main() {
 		return 1;
 	}
 
-	motor.initDCMotor();
+	//motor.initDCMotor();
+	motor.initDCMotorPwm();
 	tracer.setUp();
 	ir.setUp();
 
@@ -68,9 +69,10 @@ int main() {
 		int controlRight = ir.RightIr() & tracer.rightIrTracer() & stopBit;
 		int controlLeft = ir.LeftIr() & tracer.leftIrTracer() & stopBit;
 
-		motor.control(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft));
+		//motor.control(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft));
+		motor.controlPwm(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft), 0);
 
-		laneTracerCam.trace(motor);
+		//laneTracerCam.trace(motor);
 
 	}
 

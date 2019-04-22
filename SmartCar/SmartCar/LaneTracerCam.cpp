@@ -7,8 +7,11 @@
 using namespace std;
 using namespace cv;
 
+VideoCapture cap("D:\\test.mp4");
+
+
 void LaneTracerCam::trace(Motor m) {
-	VideoCapture cap("D:\\test.mp4");
+	
 
 	if (!cap.isOpened())
 	{
@@ -20,8 +23,8 @@ void LaneTracerCam::trace(Motor m) {
 
 	Mat frame, whiteLane, yellowLane, LinesImg, HSV_Img;
 
-	while (1)
-	{
+	//while (1)
+	//{
 
 		bool b = cap.read(frame);
 
@@ -134,9 +137,9 @@ void LaneTracerCam::trace(Motor m) {
 		if (waitKey(30) == 27)
 		{
 			cout << "esc";
-			break;
+			//break;
 		}
-	}
+	//}
 }
 
 
