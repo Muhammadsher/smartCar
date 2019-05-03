@@ -50,7 +50,6 @@ int main() {
 	IR ir;
 	//LaneTracerCam laneTracerCam;
 
-
 	if (wiringPiSetup() == -1) {
 		cout << "Setup wiringPi failed !" << endl;
 		return 1;

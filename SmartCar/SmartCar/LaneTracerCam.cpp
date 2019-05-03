@@ -12,7 +12,6 @@ VideoCapture cap("D:\\test.mp4");
 
 void LaneTracerCam::trace(Motor m) {
 
-
 	if (!cap.isOpened())
 	{
 		cout << "error";
