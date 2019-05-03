@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="IR.cpp" />
     <ClCompile Include="IR_Tracer.cpp" />
-    <ClCompile Include="LaneTracerCam.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Motor.cpp" />
     <ClCompile Include="Ultrasonic.cpp" />
@@ -29,7 +28,6 @@
   <ItemGroup>
     <ClInclude Include="IR.h" />
     <ClInclude Include="IR_Tracer.h" />
-    <ClInclude Include="LaneTracerCam.h" />
     <ClInclude Include="Motor.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Ultrasonic.h" />
@@ -82,11 +80,9 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\OpenCvTestProject\OpenCvTestProject\OpenCV_Debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\OpenCvTestProject\OpenCvTestProject\OpenCV_release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
