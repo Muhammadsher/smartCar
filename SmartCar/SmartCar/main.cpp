@@ -1,16 +1,19 @@
 #include "IR.h"
 #include "IR_Tracer.h"
 #include "Motor.h"
+//#include "LaneTracerCam.h"
 #include <wiringPi.h>
 #include <iostream>
 #include <thread>
 #include <atomic>
 
+using namespace std;
+
 #define TRIG_PIN 28
 #define ECHO_PIN 29
 
 using namespace std;
-atomic<bool> stopBit{TRUE};
+atomic<bool> stopBit{ TRUE };
 
 void setUpUltrasonic() {
 	pinMode(TRIG_PIN, OUTPUT);
@@ -38,7 +41,6 @@ void getDistance() {
 		distance = (end_time - start_time) / 29. / 2.;
 
 		stopBit = (distance > 35);
-		cout << "Distance: " << distance << endl;
 	}
 }
 
@@ -46,13 +48,16 @@ int main() {
 	Motor motor;
 	IR_Tracer tracer;
 	IR ir;
+	//LaneTracerCam laneTracerCam;
+
 
 	if (wiringPiSetup() == -1) {
 		cout << "Setup wiringPi failed !" << endl;
 		return 1;
 	}
 
-	motor.initDCMotor();
+	//motor.initDCMotor();
+	motor.initDCMotorPwm();
 	tracer.setUp();
 	ir.setUp();
 
@@ -64,8 +69,10 @@ int main() {
 		int controlRight = ir.RightIr() & tracer.rightIrTracer() & stopBit;
 		int controlLeft = ir.LeftIr() & tracer.leftIrTracer() & stopBit;
 
-		motor.control(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft));
+		//motor.control(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft));
+		motor.controlPwm(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft), 0);
 
+		//laneTracerCam.trace(motor);
 
 	}
 
