@@ -13,7 +13,7 @@ using namespace std;
 #define ECHO_PIN 29
 
 using namespace std;
-atomic<bool> stopBit{TRUE};
+atomic<bool> stopBit{ TRUE };
 
 void setUpUltrasonic() {
 	pinMode(TRIG_PIN, OUTPUT);
@@ -49,7 +49,6 @@ int main() {
 	IR_Tracer tracer;
 	IR ir;
 	//LaneTracerCam laneTracerCam;
-	
 
 	if (wiringPiSetup() == -1) {
 		cout << "Setup wiringPi failed !" << endl;

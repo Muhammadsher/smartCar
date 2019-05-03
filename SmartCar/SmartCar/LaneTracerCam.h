@@ -1,4 +1,3 @@
-
 #ifndef LaneTracerCam_h
 #define LaneTracerCam_h
 

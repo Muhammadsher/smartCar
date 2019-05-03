@@ -69,7 +69,7 @@ void Motor::controlPwm(int p1, int p4, int p5, int p6, int withPwm)
 	softPwmWrite(IN4_PIN, (p6 + (sMp * p6)) * speed);
 }
 
-void Motor::goForward(int speed) 
+void Motor::goForward(int speed)
 {
 	softPwmWrite(IN1_PIN, speed);
 	softPwmWrite(IN2_PIN, MIN_SPEED);
@@ -89,7 +89,7 @@ void Motor::goBackward(int speed)
 	cout << "Back\n";
 }
 
-void Motor::goLeft(int speed) 
+void Motor::goLeft(int speed)
 {
 	softPwmWrite(IN1_PIN, LOW);
 	softPwmWrite(IN2_PIN, speed);
@@ -99,7 +99,7 @@ void Motor::goLeft(int speed)
 	cout << "Left\n";
 }
 
-void Motor::goRight(int speed) 
+void Motor::goRight(int speed)
 {
 	softPwmWrite(IN1_PIN, speed);
 	softPwmWrite(IN2_PIN, LOW);
@@ -109,7 +109,7 @@ void Motor::goRight(int speed)
 	cout << "Right\n";
 }
 
-void Motor::stopDCMotor() 
+void Motor::stopDCMotor()
 {
 	digitalWrite(IN1_PIN, LOW);
 	digitalWrite(IN2_PIN, LOW);
@@ -117,4 +117,3 @@ void Motor::stopDCMotor()
 	digitalWrite(IN4_PIN, LOW);
 	cout << "Stop\n";
 }
-
