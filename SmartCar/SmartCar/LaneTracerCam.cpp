@@ -42,7 +42,7 @@ void LaneTracerCam::trace(Motor m) {
 		cv::Rect roi(0, img_height - img_height / 2.2, img_width, img_height / 2.2);
 		tmp = frame(roi);
 
-		video.write(frame);
+		video.write(tmp);
 		if (frame.empty())
 		{
 			cout << "err";
