@@ -1,6 +1,6 @@
 #include "LaneTracerCam.h"
 #include "DetectSign.h"
-#include <opencv2/highgui/highgui.hpp>
+//#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <thread>
@@ -23,11 +23,11 @@ void LaneTracerCam::trace(Motor m, bool flg) {
 	}*/
 
 
-	raspicam::RaspiCam_Cv cap;
-	cap.open();
-
-	Mat frame, whiteLane, yellowLane, LinesImg, HSV_Img;
 	Mat bgr, frame_roi;
+
+	
+
+	//Mat frame, whiteLane, yellowLane, LinesImg, HSV_Img;
 	
 	VideoWriter video("output2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(640, 480));
 	raspicam::RaspiCam_Cv capture;
