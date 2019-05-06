@@ -1,7 +1,8 @@
 #include "IR.h"
 #include "IR_Tracer.h"
 #include "Motor.h"
-//#include "LaneTracerCam.h"
+#include "LaneTracerCam.h"
+#include "DetectSign.h"
 #include <wiringPi.h>
 #include <iostream>
 #include <thread>
@@ -48,6 +49,7 @@ int main() {
 	Motor motor;
 	IR_Tracer tracer;
 	IR ir;
+	DS detectSign;
 	//LaneTracerCam laneTracerCam;
 
 	if (wiringPiSetup() == -1) {
@@ -62,6 +64,7 @@ int main() {
 
 	setUpUltrasonic();
 	thread th(getDistance);
+	thread trace(&LaneTracerCam::trace, motor);
 
 	while (1)
 	{
