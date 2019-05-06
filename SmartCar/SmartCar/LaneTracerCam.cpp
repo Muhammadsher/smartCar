@@ -44,6 +44,7 @@ void LaneTracerCam::trace(Motor m, bool flg) {
 		imshow("ROI", bgr);
 		video.write(bgr);
 		if (flg == 1) {
+			cout << "Stop capturing\n";
 			video.release();
 			capture.release();
 			break;

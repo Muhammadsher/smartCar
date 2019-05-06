@@ -80,8 +80,10 @@ int main() {
 		//laneTracerCam.trace(motor);
 
 		char c = cv::waitKey(0);
-		if ('q' == c)
+		if ('q' == c) {
 			stopRecording = 1;
+			cout << "stop key q\n";
+		}
 
 	}
 
