@@ -1,5 +1,4 @@
 #include "LaneTracerCam.h"
-#include "Motor.h"
 #include "DetectSign.h"
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
