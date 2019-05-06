@@ -22,12 +22,11 @@ void LaneTracerCam::trace(Motor m) {
 		exit(-1);
 	}*/
 
-	VideoWriter video("output2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(640, 480));
 
 	raspicam::RaspiCam_Cv cap;
 	cap.open();
 
-	Mat frame, whiteLane, yellowLane, LinesImg, HSV_Img, tmp;
+	Mat frame, whiteLane, yellowLane, LinesImg, HSV_Img;
 
 	while (1)
 	{
@@ -36,13 +35,6 @@ void LaneTracerCam::trace(Motor m) {
 		cap.grab();
 		cap.retrieve(frame);
 
-		resize(frame, frame, Size(640, 480));
-		int img_height = frame.size().height;
-		int img_width = frame.size().width;
-		cv::Rect roi(0, img_height - img_height / 2.2, img_width, img_height / 2.2);
-		tmp = frame(roi);
-
-		video.write(tmp);
 		if (frame.empty())
 		{
 			cout << "err";
@@ -155,6 +147,4 @@ void LaneTracerCam::trace(Motor m) {
 			break;
 		}
 	}
-	video.release();
-	cap.release();
 }
