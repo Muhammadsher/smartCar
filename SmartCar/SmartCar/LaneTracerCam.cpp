@@ -22,7 +22,7 @@ void LaneTracerCam::trace(Motor m) {
 		exit(-1);
 	}*/
 
-	VideoWriter video("output2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(320, 240));
+	VideoWriter video("output2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10);
 
 	raspicam::RaspiCam_Cv cap;
 	cap.open();
