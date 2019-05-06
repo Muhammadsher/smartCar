@@ -50,7 +50,7 @@ int main() {
 	IR_Tracer tracer;
 	IR ir;
 	DS detectSign;
-	//LaneTracerCam laneTracerCam;
+	LaneTracerCam * laneTracerCam = new LaneTracerCam();
 
 	if (wiringPiSetup() == -1) {
 		cout << "Setup wiringPi failed !" << endl;
@@ -64,7 +64,7 @@ int main() {
 
 	setUpUltrasonic();
 	thread th(getDistance);
-	thread trace(&LaneTracerCam::trace, motor);
+	thread trace(&LaneTracerCam::trace, laneTracerCam, motor);
 
 	while (1)
 	{
