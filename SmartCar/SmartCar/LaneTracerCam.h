@@ -10,7 +10,7 @@ public:
 
 	}
 
-	void trace(Motor);
+	void trace(Motor, bool);
 
 };
 

@@ -8,6 +8,8 @@
 #include <thread>
 #include <atomic>
 
+#include "opencv2/opencv.hpp"
+
 using namespace std;
 
 #define TRIG_PIN 28
@@ -51,6 +53,7 @@ int main() {
 	IR ir;
 	DS detectSign;
 	LaneTracerCam * laneTracerCam = new LaneTracerCam();
+	bool stopRecording = 0;
 
 	if (wiringPiSetup() == -1) {
 		cout << "Setup wiringPi failed !" << endl;
@@ -64,7 +67,7 @@ int main() {
 
 	setUpUltrasonic();
 	thread th(getDistance);
-	thread trace(&LaneTracerCam::trace, laneTracerCam, motor);
+	thread trace(&LaneTracerCam::trace, laneTracerCam, motor, stopRecording);
 
 	while (1)
 	{
@@ -75,6 +78,10 @@ int main() {
 		motor.controlPwm(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft), 0);
 
 		//laneTracerCam.trace(motor);
+
+		char c = cv::waitKey(0);
+		if ('q' == c)
+			stopRecording = 1;
 
 	}
 
