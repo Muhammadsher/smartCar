@@ -29,21 +29,21 @@ void LaneTracerCam::trace(Motor m, bool flg) {
 
 	//Mat frame, whiteLane, yellowLane, LinesImg, HSV_Img;
 	
-	VideoWriter video("output2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(640, 480));
+	VideoWriter video("output2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(320, 240));
 	raspicam::RaspiCam_Cv capture;
 
 	capture.open(); // activate the raspicam object
 	while (1) {
 		capture.grab();
 		capture.retrieve(bgr);
-		resize(bgr, bgr, Size(640, 480));
+		resize(bgr, bgr, Size(320, 240));
 		int img_height = bgr.size().height;
 		int img_width = bgr.size().width;
 		cv::Rect roi(0, img_height - img_height / 2.2, img_width, img_height / 2.2);
 		frame_roi = bgr(roi);
 		imshow("ROI", bgr);
 		video.write(bgr);
-		char c = cv::waitKey(0);
+		char c = cv::waitKey(20);
 		if ('q' == c) {
 			cout << "stop key q\n";
 			video.release();
