@@ -1,7 +1,7 @@
 #ifndef Motor_h
 #define Motor_h
 
-#define MAX_SPEED 100
+#define MAX_SPEED 70
 #define MIN_SPEED 5		// MIN_SPEED = 6 * MIN_SPEED;
 
 class Motor {

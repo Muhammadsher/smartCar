@@ -1,7 +1,8 @@
 #include "IR.h"
 #include "IR_Tracer.h"
 #include "Motor.h"
-//#include "LaneTracerCam.h"
+#include "LaneTracerCam.h"
+#include "DetectSign.h"
 #include <wiringPi.h>
 #include <iostream>
 #include <thread>
@@ -48,7 +49,8 @@ int main() {
 	Motor motor;
 	IR_Tracer tracer;
 	IR ir;
-	//LaneTracerCam laneTracerCam;
+	DS detectSign;
+	LaneTracerCam * laneTracerCam = new LaneTracerCam();
 
 	if (wiringPiSetup() == -1) {
 		cout << "Setup wiringPi failed !" << endl;
@@ -62,6 +64,7 @@ int main() {
 
 	setUpUltrasonic();
 	thread th(getDistance);
+	thread trace(&LaneTracerCam::trace, laneTracerCam, motor);
 
 	while (1)
 	{
