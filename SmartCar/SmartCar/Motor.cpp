@@ -1,24 +1,6 @@
 #include "Motor.h"
-#include <iostream>
-#include <cstdio>
-#include <wiringPi.h>
-#include <softPwm.h>
 
-using namespace std;
-
-#define IN1_PIN 1
-#define IN2_PIN 4
-#define IN3_PIN 5
-#define IN4_PIN 6
-
-#define MOTOR_INIT digitalWrite(1, HIGH); digitalWrite(4,HIGH); digitalWrite(5, HIGH); digitalWrite(6,HIGH)
-#define MOTOR_GO_FORWARD digitalWrite(1,HIGH); digitalWrite(4,LOW); digitalWrite(5,HIGH); digitalWrite(6,LOW)
-#define MOTOR_GO_BACK digitalWrite(4,HIGH); digitalWrite(1,LOW); digitalWrite(6,HIGH); digitalWrite(5,LOW)
-#define MOTOR_GO_RIGHT digitalWrite(1,HIGH);digitalWrite(4,LOW); digitalWrite(6,HIGH); digitalWrite(5,LOW)
-#define MOTOR_GO_LEFT digitalWrite(4,HIGH); digitalWrite(1,LOW); digitalWrite(5,HIGH); digitalWrite(6,LOW)
-#define MOTOR_GO_STOP digitalWrite(1, LOW); digitalWrite(4,LOW); digitalWrite(5, LOW); digitalWrite(6,LOW)
-
-void Motor::initDCMotor() {
+/*void Motor::initDCMotor() {
 
 	pinMode(IN1_PIN, OUTPUT);
 	pinMode(IN2_PIN, OUTPUT);
@@ -29,12 +11,7 @@ void Motor::initDCMotor() {
 	digitalWrite(IN2_PIN, HIGH);
 	digitalWrite(IN3_PIN, HIGH);
 	digitalWrite(IN4_PIN, HIGH);
-
-	/*softPwmCreate(IN1_PIN, MIN_SPEED, MAX_SPEED);
-	softPwmCreate(IN2_PIN, MIN_SPEED, MAX_SPEED);
-	softPwmCreate(IN3_PIN, MIN_SPEED, MAX_SPEED);
-	softPwmCreate(IN4_PIN, MIN_SPEED, MAX_SPEED);*/
-}
+}*/
 
 void Motor::initDCMotorPwm() {
 
@@ -50,13 +27,13 @@ void Motor::initDCMotorPwm() {
 }
 
 
-void Motor::control(int p1, int p4, int p5, int p6)
+/*void Motor::control(int p1, int p4, int p5, int p6)
 {
 	digitalWrite(IN1_PIN, p1);
 	digitalWrite(IN2_PIN, p4);
 	digitalWrite(IN3_PIN, p5);
 	digitalWrite(IN4_PIN, p6);
-}
+}*/
 
 void Motor::controlPwm(int p1, int p4, int p5, int p6, int withPwm)
 {
@@ -69,6 +46,7 @@ void Motor::controlPwm(int p1, int p4, int p5, int p6, int withPwm)
 	softPwmWrite(IN4_PIN, (p6 + (sMp * p6)) * speed);
 }
 
+/*
 void Motor::goForward(int speed)
 {
 	softPwmWrite(IN1_PIN, speed);
@@ -117,3 +95,4 @@ void Motor::stopDCMotor()
 	digitalWrite(IN4_PIN, LOW);
 	cout << "Stop\n";
 }
+*/

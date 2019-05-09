@@ -67,22 +67,22 @@ int DS::recog(Mat &cropImage, size_t vec) {
 char * DS::readable(int res) {
 	switch (res)
 	{
-	case SIGN_CIRCLE:
-		return "Circle";
-	case SIGN_LEFT:
-		return "Left";
-	case SIGN_RIGHT:
-		return "Right";
-	case SIGN_FORWARD:
-		return "Forward";
-	case SIGN_STOP:
-		return "Stop";
-	case SIGN_PEDESTRIAN:
-		return "Pedistrian";
-	case SIGN_PARKING:
-		return "Parking";
-	default:
-		return "NOT DEFINED";
+		case SIGN_CIRCLE:
+			return "Circle";
+		case SIGN_LEFT:
+			return "Left";
+		case SIGN_RIGHT:
+			return "Right";
+		case SIGN_FORWARD:
+			return "Forward";
+		case SIGN_STOP:
+			return "Stop";
+		case SIGN_PEDESTRIAN:
+			return "Pedistrian";
+		case SIGN_PARKING:
+			return "Parking";
+		default:
+			return "NOT DEFINED";
 	}
 }
 

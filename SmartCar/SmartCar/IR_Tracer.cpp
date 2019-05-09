@@ -1,11 +1,4 @@
 #include "IR_Tracer.h"
-#include <iostream>
-#include <wiringPi.h>
-
-#define TrackSensorPinRight    11
-#define TrackSensorPinLeft    10
-
-using namespace std;
 
 int IR_Tracer::setUp() {
 

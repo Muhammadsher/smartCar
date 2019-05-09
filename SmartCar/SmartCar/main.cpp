@@ -1,59 +1,29 @@
 #include "IR.h"
 #include "IR_Tracer.h"
 #include "Motor.h"
+#include "Ultrasonic.h"
 #include "LaneTracerCam.h"
 #include "DetectSign.h"
-#include <wiringPi.h>
 #include <iostream>
 #include <thread>
 #include <atomic>
+#include "wiringPi.h"
 
-#include "opencv2/opencv.hpp"
-
-using namespace std;
-
-#define TRIG_PIN 28
-#define ECHO_PIN 29
 
 using namespace std;
-atomic<bool> stopBit{ TRUE };
 
-void setUpUltrasonic() {
-	pinMode(TRIG_PIN, OUTPUT);
-	pinMode(ECHO_PIN, INPUT);
-}
+atomic<bool> stopBit{ 1 };
+atomic<int> lineInTheLeft{ 0 };
+atomic<int> lineInTheRight{ 0 };
 
-void getDistance() {
-
-	while (1) {
-		int start_time = 0, end_time = 0;
-		float distance = 0;
-
-		digitalWrite(TRIG_PIN, LOW);
-		delay(500);
-		digitalWrite(TRIG_PIN, HIGH);
-		delayMicroseconds(10);
-		digitalWrite(TRIG_PIN, LOW);
-
-		while (digitalRead(ECHO_PIN) == 0);
-		start_time = micros();
-
-		while (digitalRead(ECHO_PIN) == 1);
-		end_time = micros();
-
-		distance = (end_time - start_time) / 29. / 2.;
-
-		stopBit = (distance > 35);
-	}
-}
 
 int main() {
-	Motor motor;
-	IR_Tracer tracer;
-	IR ir;
-	DS detectSign;
 	LaneTracerCam * laneTracerCam = new LaneTracerCam();
-	bool stopRecording = 0;
+	Ultrasonic * ultrasonic = new Ultrasonic();
+	IR_Tracer tracer;
+	DS detectSign;
+	Motor motor;
+	IR ir;
 
 	if (wiringPiSetup() == -1) {
 		cout << "Setup wiringPi failed !" << endl;
@@ -65,19 +35,21 @@ int main() {
 	tracer.setUp();
 	ir.setUp();
 
-	setUpUltrasonic();
-	thread th(getDistance);
-	thread trace(&LaneTracerCam::trace, laneTracerCam, motor, stopRecording);
+	thread th(&Ultrasonic::getDistance, ultrasonic, std::ref(stopBit));
+
+	thread trace(&LaneTracerCam::trace, laneTracerCam, motor, std::ref(lineInTheLeft), std::ref(lineInTheRight));
 
 	while (1)
 	{
 		int controlRight = ir.RightIr() & tracer.rightIrTracer() & stopBit;
 		int controlLeft = ir.LeftIr() & tracer.leftIrTracer() & stopBit;
 
+		controlLeft = controlLeft | lineInTheLeft;
+		controlRight = controlRight | lineInTheRight;
+
 		//motor.control(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft));
 		motor.controlPwm(controlRight, (controlLeft & ~controlRight), controlLeft, (controlRight & ~controlLeft), 0);
 
-		//laneTracerCam.trace(motor);
 	}
 
 	return 0;
