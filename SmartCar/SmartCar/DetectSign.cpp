@@ -1,212 +1,249 @@
 #include "DetectSign.h"
-using namespace cv;
-using namespace std;
 
-DS::DS() {
-	cascade_circle.load("./HAAR/circle_cascade.xml");
-	cascade_forward.load("./HAAR/forward_cascade.xml");
-	cascade_left.load("./HAAR/left_cascade.xml");
-	cascade_right.load("./HAAR/right_cascade.xml");
-	cascade_stop.load("./HAAR/stop_cascade.xml");
-	cascade_parking.load("./HAAR/parking_cascade.xml");
-	cascade_pedestrian.load("./HAAR/becareful_cascade.xml");
+DetectSign2::DetectSign2() {
+	// not implemented
 }
 
-double DS::angle(Point pt1, Point pt2, Point pt0) {
-	double dx1 = pt1.x - pt0.x;
-	double dy1 = pt1.y - pt0.y;
-	double dx2 = pt2.x - pt0.x;
-	double dy2 = pt2.y - pt0.y;
-	return (dx1*dx2 + dy1*dy2) / sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
-}
+void DetectSign2::detect(MAGU &magu, std::atomic<int> &res, bool debug) {
+	//std::lock_guard<std::mutex> lock(mtx);
 
-Mat DS::CropImage(Mat &img, const vector<Point> &vec) {
-	Rect boundRect = cv::boundingRect(cv::Mat(vec));
-	cv::Mat	cropImage = img(boundRect);
-	return cropImage;
-}
-
-int DS::recog(Mat &cropImage, size_t vec) {
-	if (vec == 3) {
-		cascade_pedestrian.detectMultiScale(cropImage, res_cas_pedestrian, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(100, 100));
-		if (res_cas_pedestrian.size() > 0)
-			return SIGN_PEDESTRIAN;
-	}
-	else if (vec == 4) {
-		cascade_parking.detectMultiScale(cropImage, res_cas_parking, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(100, 100));
-		if (res_cas_parking.size() > 0)
-			return SIGN_PARKING;
-	}
-	else if (vec == 8) {
-
-		cascade_stop.detectMultiScale(cropImage, res_cas_stop, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(100, 100));
-		if (res_cas_stop.size() > 0)
-			return SIGN_STOP;
-
-		cascade_circle.detectMultiScale(cropImage, res_cas_circle, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(100, 100));
-		if (res_cas_circle.size() > 0)
-			return SIGN_CIRCLE;
-
-		cascade_right.detectMultiScale(cropImage, res_cas_right, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(100, 100));
-		if (res_cas_right.size() > 0)
-			return SIGN_RIGHT;
-
-		cascade_left.detectMultiScale(cropImage, res_cas_left, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(100, 100));
-		if (res_cas_left.size() > 0)
-			return SIGN_LEFT;
-
-		cascade_forward.detectMultiScale(cropImage, res_cas_forward, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(100, 100));
-		if (res_cas_forward.size() > 0)
-			return SIGN_FORWARD;
-
-	}
-
-	return SIGN_NOT_DEFINED;
-}
-
-char * DS::readable(int res) {
-	switch (res)
+	while (true)
 	{
-		case SIGN_CIRCLE:
-			return "Circle";
-		case SIGN_LEFT:
-			return "Left";
-		case SIGN_RIGHT:
-			return "Right";
-		case SIGN_FORWARD:
-			return "Forward";
-		case SIGN_STOP:
-			return "Stop";
-		case SIGN_PEDESTRIAN:
-			return "Pedistrian";
-		case SIGN_PARKING:
-			return "Parking";
-		default:
-			return "NOT DEFINED";
-	}
-}
+		src = magu.getImage();
+		cout << "Detect got image" << endl;
 
-/**  @function Erosion  */
-void DS::Erosion(Mat &src, int erosion_elem, int erosion_size)
-{
-	int erosion_type;
-	if (erosion_elem == 0) { erosion_type = MORPH_RECT; }
-	else if (erosion_elem == 1) { erosion_type = MORPH_CROSS; }
-	else if (erosion_elem == 2) { erosion_type = MORPH_ELLIPSE; }
+		if (src.empty()) return;
+		cv::Mat hsvi, blue_hui, red_hui;
 
-	Mat element = getStructuringElement(erosion_type,
-		Size(2 * erosion_size + 1, 2 * erosion_size + 1),
-		Point(erosion_size, erosion_size));
+		std::vector<MatRect> res_rect;
 
-	/// Apply the erosion operation
-	erode(src, src, element);
-}
+		cv::Mat _src = src(cv::Rect(0, 0, src.cols, src.rows / 2));
 
-/** @function Dilation */
-void DS::Dilation(Mat &src, int dilation_elem, int dilation_size)
-{
-	int dilation_type;
-	if (dilation_elem == 0) { dilation_type = MORPH_RECT; }
-	else if (dilation_elem == 1) { dilation_type = MORPH_CROSS; }
-	else if (dilation_elem == 2) { dilation_type = MORPH_ELLIPSE; }
+		cv::medianBlur(_src, _src, 3);
 
-	Mat element = getStructuringElement(dilation_type,
-		Size(2 * dilation_size + 1, 2 * dilation_size + 1),
-		Point(dilation_size, dilation_size));
-	/// Apply the dilation operation
-	dilate(src, src, element);
-}
+		cvtColor(_src, hsvi, cv::COLOR_BGR2HSV);
 
-int DS::detect(Mat &src) {
-	if (src.empty()) return SIGN_NOT_DEFINED;
+		detectRed(hsvi, red_hui, res_rect);
 
-	Rect boundRect;
+		detectBlue(hsvi, blue_hui, res_rect);
 
-	Mat dst, hsv_image, lower_red_hue_range, upper_red_hue_range, blue_hue_image, hue_image, cr;
+		ident(red_hui, blue_hui, res_rect);
 
-	vector<vector<Point> > contours;
+		std::sort(res_rect.begin(), res_rect.end(), std::greater<MatRect>());
 
-	int res;
+		if (debug) {
+			for (int i = 0; i < res_rect.size(); i++) {
+				std::cout << i << ") " <<
+					"SIGN: " << readable(res_rect[i].Result) << "; " <<
+					"isRed: " << res_rect[i].isRed << "; " <<
+					"isOctal: " << res_rect[i].isOctal << "; " <<
+					"isTriangle: " << res_rect[i].isTriangle << "; " <<
+					"isBlue: " << res_rect[i].isBlue << "; " <<
+					"isCircle: " << res_rect[i].isCircle << "; " <<
+					"isRect: " << res_rect[i].isRect << "; " <<
+					"Rect: " << res_rect[i].bounds << "; " <<
+					"Area: " << res_rect[i].bounds.area() << "; " << std::endl;
 
-	double aprx;
-
-	// Convert RGB to HSV
-	cvtColor(src, hsv_image, COLOR_BGR2HSV);
-
-	// Get red shapes
-	inRange(hsv_image, Scalar(0, 100, 100), Scalar(10, 255, 255), lower_red_hue_range);
-	inRange(hsv_image, Scalar(160, 100, 100), Scalar(179, 255, 255), upper_red_hue_range);
-
-	// Get blue shapes
-	inRange(hsv_image, Scalar(103, 90, 50), Scalar(130, 255, 255), blue_hue_image);
-
-	// Combine three images
-	addWeighted(lower_red_hue_range, 1.0, upper_red_hue_range, 1.0, 0.0, hue_image);
-	addWeighted(hue_image, 1.0, blue_hue_image, 1.0, 0.0, hue_image);
-
-	Dilation(hue_image, 1, 5);
-	//Erosion(hue_image, 0, 0);
-
-	// Find contours
-	findContours(hue_image.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-
-	vector<vector<Point>> approx(contours.size());
-
-	dst = src.clone();
-
-	for (int i = 0; i < contours.size(); i++)
-	{
-		approxPolyDP(Mat(contours[i]), approx[i], arcLength(Mat(contours[i]), true)*0.025, true);
-		cr = CropImage(src, contours[i]);
-		aprx = (double)cr.cols / cr.rows;
-
-		if (aprx < 0.7 || aprx > 1.3 || (cr.cols * cr.rows) < 8000)
-			continue;
-
-		if (approx[i].size() == 3 || approx[i].size() == 4)
-		{
-			res = recog(cr, approx[i].size());
-			if (res == SIGN_NOT_DEFINED) continue;
-			return res;
-		}
-		else {
-			res = recog(cr, 8);
-
-			if (res == SIGN_LEFT || res == SIGN_RIGHT) {
-				int left_nonzero = countNonZero(hue_image(Rect(0, hue_image.rows / 3, hue_image.cols / 5, hue_image.rows / 3)));
-				int right_nonzero = countNonZero(hue_image(Rect(4 * hue_image.cols / 5, hue_image.rows / 3, hue_image.cols / 5, hue_image.rows / 3)));
-
-				rectangle(hue_image, Rect(0, hue_image.rows / 3, hue_image.cols / 5, hue_image.rows / 3), Scalar(0, 0, 0));
-				rectangle(hue_image, Rect(4 * hue_image.cols / 5, hue_image.rows / 3, hue_image.cols / 5, hue_image.rows / 3), Scalar(0, 0, 0));
-				
-				if (left_nonzero > right_nonzero)
-					return SIGN_LEFT;
-				else
-					return SIGN_RIGHT;
+				if (res_rect[i].Result != SIGN_NOT_DEFINED) {
+					cv::rectangle(_src, res_rect[i].bounds, cv::Scalar(0, 0, 255), 2);
+					cv::putText(_src, std::to_string(i) + ") " + readable(res_rect[i].Result), cv::Point(res_rect[i].bounds.x, res_rect[i].bounds.y), cv::FONT_HERSHEY_PLAIN, 2.0, CV_RGB(255, 0, 255), 2);
+				}
 			}
 
-			if (res == SIGN_NOT_DEFINED) continue;
-			return res;
+			resize(_src, _src, cv::Size(0, 0), 0.5, 0.5);
+			imshow("SRC", _src);
+			cv::waitKey(1);
+		}
+		if (res_rect.size() > 0) {
+			res = res_rect[0].Result;
+		}
+		else {
+			res = SIGN_NOT_DEFINED;
 		}
 	}
-	return SIGN_NOT_DEFINED;
 }
 
-int DS::trafficControl(Mat &src) {
-	if (src.empty()) return SIGN_NOT_DEFINED;
+std::string DetectSign2::readable(int value) {
+	switch (value)
+	{
+	case SIGN_CIRCLE:
+		return "Circle";
+	case SIGN_LEFT:
+		return "Left";
+	case SIGN_RIGHT:
+		return "Right";
+	case SIGN_FORWARD:
+		return "Forward";
+	case SIGN_STOP:
+		return "Stop";
+	case SIGN_PEDESTRIAN:
+		return "Pedistrian";
+	case SIGN_PARKING:
+		return "Parking";
+	default:
+		return "NOT DEFINED";
+	}
+}
 
-	Mat hi, hsvi;
-	vector<vector<Point> > contours;
+void DetectSign2::ident(cv::Mat &rhi, cv::Mat &bhi, std::vector<MatRect> &mr) {
+	for (int i = 0; i < mr.size(); i++) {
+		if (mr[i].isRed && mr[i].isOctal) {
+			// Octal
+			cv::Rect r = mr[i].bounds;
+			r.y += r.height / 3;
+			r.height = r.height / 3;
 
-	cvtColor(src, hsvi, COLOR_BGR2HSV);
+			threshold(rhi(r), rhi(r), 200, 0, 3);
 
-	inRange(hsvi, Scalar(0, 0, 255), Scalar(255, 200, 255), hi);
+			int x = cv::countNonZero(rhi(r));
+			int y = r.width * r.height;
+			double dif = (double)x / y;
 
-	Dilation(hi, 1, 2);
-	Erosion(hi, 1, 1);
-	Erosion(hi, 1, 1);
+			if (dif < 0.60 && dif > 0.48) {
+				mr[i].Result = SIGN_STOP;
+			}
+		}
+		else if (mr[i].isRed && mr[i].isTriangle) {
+			// Triangle
+			cv::Rect r = mr[i].bounds;
+			r.x += r.width / 3;
+			r.y += r.height / 3;
+			r.height = r.height / 3;
+			r.width = r.width / 3;
 
-	findContours(hi, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+			int x = cv::countNonZero(rhi(r));
+			int y = r.width * r.height;
+			double dif = (double)x / y;
 
-	return contours.size() < 3 && contours.size() > 0;
+			if (dif < 0.20) {
+				mr[i].Result = SIGN_PEDESTRIAN;
+			}
+		}
+		else if (mr[i].isBlue && mr[i].isRect) {
+			// Rectangle
+			int x = cv::countNonZero(bhi(mr[i].bounds));
+			int y = mr[i].bounds.width * mr[i].bounds.height;
+			double dif = (double)x / y;
+
+			if (dif > 0.75 && dif < 0.90) {
+				mr[i].Result = SIGN_PARKING;
+			}
+		}
+		else if (mr[i].isBlue && mr[i].isCircle) {
+			// Circle
+			threshold(bhi(mr[i].bounds), bhi(mr[i].bounds), 200, 0, 3);
+
+			double circle = (double)cv::countNonZero(bhi(mr[i].bounds)) / mr[i].bounds.area();
+
+			if (circle > 0.30 && circle < 0.50) {
+				mr[i].Result = SIGN_CIRCLE;
+			}
+			else {
+				cv::Rect left(mr[i].bounds.x + 5, mr[i].bounds.y + (mr[i].bounds.height / 3), (mr[i].bounds.width / 5) - 5, mr[i].bounds.height / 3),
+					right(mr[i].bounds.x + (mr[i].bounds.width * 4 / 5), mr[i].bounds.y + mr[i].bounds.height / 3, (mr[i].bounds.width / 5) - 5, mr[i].bounds.height / 3),
+					bottom(mr[i].bounds.x + (mr[i].bounds.width / 3), mr[i].bounds.y + (mr[i].bounds.width * 4 / 5), mr[i].bounds.width / 3, (mr[i].bounds.height / 5) - 5);
+
+				int __res__ = SIGN_LEFT;
+				int right_c = cv::countNonZero(bhi(left));
+				int left_c = cv::countNonZero(bhi(right));
+				int forward_c = cv::countNonZero(bhi(bottom));
+
+				int min = left_c;
+				if (right_c < min) {
+					min = right_c; __res__ = SIGN_RIGHT;
+				}
+				if (forward_c < min) {
+					__res__ = SIGN_FORWARD;
+				}
+				mr[i].Result = __res__;
+			}
+		}
+	}
+}
+
+void DetectSign2::detectRed(cv::Mat &hsvi, cv::Mat &hi, std::vector<MatRect> &out) {
+	cv::Scalar upper(0, 110, 61), lower(14, 255, 255);
+	MatRect mr;
+	cv::Rect _temp;
+	double __temp[2] = { 0, 0 };
+	std::vector<std::vector<cv::Point>> contours;
+
+	cv::inRange(hsvi, upper, lower, hi);
+
+	cv::GaussianBlur(hi, hi, cv::Size(5, 5), 2, 2);
+
+	cv::findContours(hi, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+	std::vector<std::vector<cv::Point>> approx(contours.size());
+
+	for (int i = 0; i < contours.size(); i++) {
+		approxPolyDP(cv::Mat(contours[i]), approx[i], cv::arcLength(cv::Mat(contours[i]), true)*0.037, true);
+
+		_temp = cv::boundingRect(approx[i]);
+		__temp[0] = cv::contourArea(approx[i]);
+		__temp[1] = (double)_temp.width / _temp.height;
+		if (__temp[0] > 2000 && __temp[0] < 19000 && __temp[1]  > 0.7 && __temp[1]  < 1.3) {
+			mr.bounds = _temp;
+			mr.isRed = true;
+			mr.isOctal = approx[i].size() >= 7 && approx[i].size() <= 9;
+			mr.isTriangle = approx[i].size() >= 3 && approx[i].size() <= 4;
+
+			out.push_back(mr);
+		}
+	}
+
+}
+
+void DetectSign2::detectBlue(cv::Mat &hsvi, cv::Mat &hi, std::vector<MatRect> &out) {
+	cv::Scalar upper(67, 54, 77), lower(130, 255, 255);
+	MatRect mr;
+	cv::Rect _temp;
+	double __temp[2] = { 0, 0 };
+	std::vector<std::vector<cv::Point>> contours;
+	std::vector<cv::Vec3f> circles;
+
+	cv::inRange(hsvi, upper, lower, hi);
+
+	cv::GaussianBlur(hi, hi, cv::Size(9, 9), 2, 2);
+
+	cv::findContours(hi, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+	std::vector<std::vector<cv::Point>> approx(contours.size());
+
+	for (int i = 0; i < contours.size(); i++) {
+		approxPolyDP(cv::Mat(contours[i]), approx[i], cv::arcLength(cv::Mat(contours[i]), true)*0.037, true);
+
+		_temp = cv::boundingRect(approx[i]);
+		__temp[0] = cv::contourArea(approx[i]);
+		__temp[1] = (double)_temp.width / _temp.height;
+		if (approx[i].size() == 4 && __temp[0] > 2000 && __temp[0] < 11000 && __temp[1]  > 0.7 && __temp[1]  < 1.3) {
+			mr.bounds = _temp;
+			mr.isBlue = true;
+			mr.isRect = true;
+
+			out.push_back(mr);
+		}
+	}
+
+	cv::HoughCircles(hi, circles, CV_HOUGH_GRADIENT, 1, hi.rows / 8, 100, 20, 40, 70);
+
+	for (size_t current_circle = 0; current_circle < circles.size(); current_circle++) {
+
+		cv::Point center((int)std::round(circles[current_circle][0]), (int)std::round(circles[current_circle][1]));
+		int radius = (int)std::round(circles[current_circle][2]);
+
+		mr.bounds = cv::Rect(center.x - radius, center.y - radius, radius * 2, radius * 2);
+
+		if (mr.bounds.x < 0) mr.bounds.x = 0;
+		if (mr.bounds.y < 0) mr.bounds.y = 0;
+		if (mr.bounds.x + mr.bounds.width > hsvi.cols) mr.bounds.width = hsvi.cols - mr.bounds.x;
+		if (mr.bounds.y + mr.bounds.height > hsvi.rows) mr.bounds.height = hsvi.rows - mr.bounds.y;
+
+		mr.isBlue = true;
+		mr.isCircle = true;
+		mr.isRect = false;
+
+		out.push_back(mr);
+	}
+
 }

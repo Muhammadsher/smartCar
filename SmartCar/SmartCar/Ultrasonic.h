@@ -1,7 +1,6 @@
 #ifndef Ultrasonic_h
 #define Ultrasonic_h
 #include <atomic>
-#include "Ultrasonic.h"
 #include <iostream>
 #include <wiringPi.h>
 

@@ -1,30 +1,35 @@
 #include "LaneTracerCam.h"
-#include "DetectSign.h"
 
 
-void LaneTracerCam::trace(Motor m, atomic<int> &left, atomic<int> &right) {
-
+void LaneTracerCam::trace(atomic<int> &left, atomic<int> &right, MAGU &magu) {
+	//traceBit = false;
+	//std::lock_guard<std::mutex> lock(mtx);
 	Mat frame, whiteLane, yellowLane, LinesImg, HSV_Img;
+	//frame = f.clone();
+	//raspicam::RaspiCam_Cv camera;
+	//camera.open();
 
-	raspicam::RaspiCam_Cv camera;
-	camera.open();
-
-	sleep(3);
+	//sleep(3);
 
 	while (true)
 	{
-		camera.grab();
-		camera.retrieve(frame);
+		//camera.grab();
+		//camera.retrieve(frame);
+
+		frame = magu.getImage();
+
+		cout << "Lane tracer got image" << endl;
 
 		frame = frame(Rect(0, frame.rows / 2, frame.cols, frame.rows / 2));
 
+
 		//resize image
-		resize(frame, frame, Size(640, 480));
+		//resize(frame, frame, Size(640, 480));
 
 
 		//here we define our region of interest
-		//box(x, y, b, c);
-		Rect const box(100, 295, 400, 185); //this mean the first corner is
+		//box(x, y, b, c); //100, 295, 400, 185
+		Rect box(frame.cols / 4, frame.rows / 2, frame.cols / 2, frame.rows / 2); //this mean the first corner is
 											//(x,y)=(100,295)
 											// and the second corner is
 											//(x + b, y+c )= (100 +400,295+185)
@@ -72,7 +77,7 @@ void LaneTracerCam::trace(Motor m, atomic<int> &left, atomic<int> &right) {
 
 		if (lines.size() == 0)
 		{
-			left = right = 0;
+			left = right = 1;
 		}
 
 		for (size_t i = 0; i < lines.size(); i++)
@@ -85,42 +90,44 @@ void LaneTracerCam::trace(Motor m, atomic<int> &left, atomic<int> &right) {
 
 			if (slope <= 0)
 			{
-				cout << "Line in the Left" << endl;
+				//cout << "Line in the Left" << endl;
 				//m.controlPwm(1, 0, 0, 1, 0);
-				right = !(left = 1);
+				right = !(left = 0);
 			}
 			else
 			{
-				cout << "Line in the Right" << endl;
+				//cout << "Line in the Right" << endl;
 				//m.controlPwm(0, 1, 1, 0, 0);
-				left = !(right = 1);
+				left = !(right = 0);
 			}
 
 		}
-		 
+		
+		rectangle(frame, box, Scalar(0, 0, 255), 2);
+
 		namedWindow("frame");
-		moveWindow("frame", 275, 30);
-		circle(frame, Point2i(300, 380), 5, Scalar(0, 125, 230), 4, 3);
 		imshow("frame", frame);
-
-
-		 /*
-		namedWindow("WhiteLane");
-		moveWindow("WhiteLane", 950, 280);
-		imshow("WhiteLane", whiteLane);
-		//  */
-		  /*
-		namedWindow("YellowLane");
-		moveWindow("YellowLane", 950, 30);
-		imshow("YellowLane", yellowLane);
-		// */
-
 		if (waitKey(20) == 27)
 		{
 			cout << "Lane Tracing Finished" << endl;
-			camera.release();
+			//traceBit = true;
 			break;
 		}
+		
+		 
+		namedWindow("WhiteLane");
+		//moveWindow("WhiteLane", 950, 280);
+		imshow("WhiteLane", whiteLane);
+		//  */
+		
+		namedWindow("YellowLane");
+		//moveWindow("YellowLane", 950, 30);
+		imshow("YellowLane", yellowLane);
+		waitKey(1);
+		// */
+
 	}
+		//traceBit = true;
+		//mtx.unlock();
 
 }

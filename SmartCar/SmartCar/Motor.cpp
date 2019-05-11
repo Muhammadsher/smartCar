@@ -13,6 +13,13 @@
 	digitalWrite(IN4_PIN, HIGH);
 }*/
 
+
+Motor::Motor(){}
+Motor::~Motor()
+{
+	controlPwm(0, 0, 0, 0, 0);
+}
+
 void Motor::initDCMotorPwm() {
 
 	pinMode(IN1_PIN, SOFT_PWM_OUTPUT);

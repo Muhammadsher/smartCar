@@ -20,9 +20,8 @@ using namespace std;
 class Motor {
 
 public:
-	Motor() {
-
-	}
+	Motor();
+	~Motor();
 	void initDCMotorPwm();
 	void controlPwm(int p1, int p4, int p5, int p6, int withPwm);
 

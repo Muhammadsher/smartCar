@@ -1,15 +1,14 @@
 #ifndef LaneTracerCam_h
 #define LaneTracerCam_h
 
-#include "Motor.h"
-#include <atomic>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <iostream>
-#include <thread>
 #include "opencv2/opencv.hpp"
-#include <raspicam/raspicam_cv.h>
+#include <iostream>
+#include <atomic>
 #include <unistd.h>
+#include <mutex>
+#include "Magu.h"
 
 using namespace std;
 using namespace cv;
@@ -21,8 +20,9 @@ public:
 
 	}
 
-	void trace(Motor, std::atomic<int> &, std::atomic<int> &);
-
+	void trace(std::atomic<int> &, std::atomic<int> &, MAGU &);
+private:
+	mutex mtx;
 };
 
 #endif

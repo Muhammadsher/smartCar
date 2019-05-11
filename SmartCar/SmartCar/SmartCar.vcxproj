@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Magu.cpp" />
     <ClCompile Include="DetectSign.cpp" />
     <ClCompile Include="IR.cpp" />
     <ClCompile Include="IR_Tracer.cpp" />
@@ -28,6 +29,7 @@
     <ClCompile Include="Ultrasonic.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Magu.h" />
     <ClInclude Include="DetectSign.h" />
     <ClInclude Include="IR.h" />
     <ClInclude Include="IR_Tracer.h" />
