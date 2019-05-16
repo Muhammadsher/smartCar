@@ -51,6 +51,7 @@ void Motor::controlPwm(int p1, int p4, int p5, int p6, int withPwm)
 	softPwmWrite(IN2_PIN, (p4 + (sMp * p4)) * speed);
 	softPwmWrite(IN3_PIN, (p5 + (sMp * p5)) * speed);
 	softPwmWrite(IN4_PIN, (p6 + (sMp * p6)) * speed);
+	delay(30);
 }
 
 /*

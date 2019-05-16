@@ -30,6 +30,6 @@ void Ultrasonic::getDistance(atomic<bool> &stopBit)
 
 		distance = (end_time - start_time) / 29. / 2.;
 
-		stopBit = (distance > 35);
+		stopBit = (distance > 10);
 	}
 }

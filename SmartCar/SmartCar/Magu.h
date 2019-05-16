@@ -8,6 +8,7 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <ctime>
 
 using namespace std;
 using namespace cv;
@@ -17,10 +18,13 @@ public:
 	MAGU();
 	~MAGU();
 	Mat getImage();
+	void captuerVideo();
+
 private:
 	mutex mtxCamera;
 	Mat frame;
 	VideoCapture cap;
+	VideoWriter writer;
 	raspicam::RaspiCam_Cv camera;
 };
 

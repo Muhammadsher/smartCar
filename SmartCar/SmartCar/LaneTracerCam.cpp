@@ -18,9 +18,9 @@ void LaneTracerCam::trace(atomic<int> &left, atomic<int> &right, MAGU &magu) {
 
 		frame = magu.getImage();
 
-		cout << "Lane tracer got image" << endl;
+		//cout << "Lane tracer got image" << endl;
 
-		frame = frame(Rect(0, frame.rows / 2, frame.cols, frame.rows / 2));
+		frame = frame(Rect(0, 2 * (frame.rows / 3), frame.cols, frame.rows / 3));
 
 
 		//resize image
@@ -77,7 +77,8 @@ void LaneTracerCam::trace(atomic<int> &left, atomic<int> &right, MAGU &magu) {
 
 		if (lines.size() == 0)
 		{
-			left = right = 1;
+			L[even] = R[even] = 1;
+			//right = left = 1;
 		}
 
 		for (size_t i = 0; i < lines.size(); i++)
@@ -88,23 +89,25 @@ void LaneTracerCam::trace(atomic<int> &left, atomic<int> &right, MAGU &magu) {
 
 			double slope = (l[3] - l[1]) / (double)(l[2] - l[0]);
 
-			if (slope <= 0)
+			if (slope < 0)
 			{
+				R[even] = !(L[even] = 0);
 				//cout << "Line in the Left" << endl;
 				//m.controlPwm(1, 0, 0, 1, 0);
-				right = !(left = 0);
+				//right = !(left = 0);
 			}
 			else
 			{
+				L[even] = !(R[even] = 0);
 				//cout << "Line in the Right" << endl;
 				//m.controlPwm(0, 1, 1, 0, 0);
-				left = !(right = 0);
+				//left = !(right = 0);
 			}
 
 		}
 		
 		rectangle(frame, box, Scalar(0, 0, 255), 2);
-
+		
 		namedWindow("frame");
 		imshow("frame", frame);
 		if (waitKey(20) == 27)
@@ -125,9 +128,12 @@ void LaneTracerCam::trace(atomic<int> &left, atomic<int> &right, MAGU &magu) {
 		imshow("YellowLane", yellowLane);
 		waitKey(1);
 		// */
-
+		if (even) {
+			left = L[0] | L[1];
+			right = R[0] | R[1];
+		}
+		even = !even;
 	}
 		//traceBit = true;
 		//mtx.unlock();
-
 }

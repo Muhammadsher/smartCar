@@ -5,68 +5,47 @@ MAGU::MAGU()
 	if (!camera.open()) {
 		cerr << "Error opening camera" << endl;
 	}
-
 	sleep(3);
 }
 
 MAGU::~MAGU()
 {
 	camera.release();
+	writer.release();
 }
 
 Mat MAGU::getImage() {
 	lock_guard<std::mutex> lg(mtxCamera);
 	camera.grab();
 	camera.retrieve(frame);
+	imshow("video", frame);
+	waitKey(1);
 	return frame;
 }
 
-/*void MAGU::start(atomic<int> &ds_result, atomic<int> &left, atomic<int> &right)
+void MAGU::captuerVideo()
 {
-	Mat frame;
-	bool debug = false;
-	atomic<bool> runTracr{ true };
-	LaneTracerCam * laneTracerCam = new LaneTracerCam();
-	DetectSign2 * DS = new DetectSign2();
+	double width = camera.get(CV_CAP_PROP_FRAME_WIDTH);
+	double height = camera.get(CV_CAP_PROP_FRAME_HEIGHT);
+	double fps = camera.get(CV_CAP_PROP_FPS);
+	double fourcc = camera.get(CV_CAP_PROP_FOURCC);
 
-	/*VideoCapture cap("./test.mp4");
+	time_t rawtime;
+	struct tm * timeinfo;
+	char buffer[80];
 
-	if (!cap.isOpened())
-	{
-		cout << "error opening" << endl;
-		return;
-	}
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
 
-	//MAGU magu;
+	strftime(buffer, sizeof(buffer), "%d_%m_%Y_%H_%M_%S", timeinfo);
+	std::string str(buffer);
 
-	//laneTracerCam->trace(frame, left, right, magu);
+	cout << width << ", " << height << ", " << fps << ", " << CV_FOURCC('M', 'J', 'P', 'G') << endl;
 
-	//thread(&LaneTracerCam::trace, laneTracerCam, std::ref(frame), std::ref(left), std::ref(right), magu);
+	writer = VideoWriter("./log/wr_"+str+".avi", CV_FOURCC('M','J','P','G'), fps, Size(width, height));
 
-	/*
 	while (true)
 	{
-		camera.grab();
-		camera.retrieve(frame);
-		imshow("video", frame);
-		waitKey(10);
-		/*bool b = cap.read(frame);
-		imshow("video", frame);
-		waitKey(10);
-
-		if (!b)
-		{
-			cout << "err";
-			cap.open("laneD.mp4");
-			cap.read(frame);
-			break;
-		}
-
-		if (runTracr)
-		{
-			thread(&LaneTracerCam::trace, laneTracerCam, std::ref(frame), std::ref(left), std::ref(right), std::ref(runTracr)).detach();
-		}
-		//thread(&DetectSign2::detect, DS, std::ref(frame), std::ref(ds_result), debug).detach();
-		//cout << DS->readable(ds_result) << endl;
+		writer.write(getImage());
 	}
-}*/
+}

@@ -5,8 +5,6 @@ DetectSign2::DetectSign2() {
 }
 
 void DetectSign2::detect(MAGU &magu, std::atomic<int> &res, bool debug) {
-	//std::lock_guard<std::mutex> lock(mtx);
-
 	while (true)
 	{
 		src = magu.getImage();
@@ -89,6 +87,7 @@ void DetectSign2::ident(cv::Mat &rhi, cv::Mat &bhi, std::vector<MatRect> &mr) {
 	for (int i = 0; i < mr.size(); i++) {
 		if (mr[i].isRed && mr[i].isOctal) {
 			// Octal
+			std::cout << "Octal" << std::endl;
 			cv::Rect r = mr[i].bounds;
 			r.y += r.height / 3;
 			r.height = r.height / 3;
@@ -105,6 +104,7 @@ void DetectSign2::ident(cv::Mat &rhi, cv::Mat &bhi, std::vector<MatRect> &mr) {
 		}
 		else if (mr[i].isRed && mr[i].isTriangle) {
 			// Triangle
+			std::cout << "Triangle" << std::endl;
 			cv::Rect r = mr[i].bounds;
 			r.x += r.width / 3;
 			r.y += r.height / 3;
@@ -121,6 +121,7 @@ void DetectSign2::ident(cv::Mat &rhi, cv::Mat &bhi, std::vector<MatRect> &mr) {
 		}
 		else if (mr[i].isBlue && mr[i].isRect) {
 			// Rectangle
+			std::cout << "Rectangle" << std::endl;
 			int x = cv::countNonZero(bhi(mr[i].bounds));
 			int y = mr[i].bounds.width * mr[i].bounds.height;
 			double dif = (double)x / y;
@@ -131,6 +132,7 @@ void DetectSign2::ident(cv::Mat &rhi, cv::Mat &bhi, std::vector<MatRect> &mr) {
 		}
 		else if (mr[i].isBlue && mr[i].isCircle) {
 			// Circle
+			std::cout << "Circle" << std::endl;
 			threshold(bhi(mr[i].bounds), bhi(mr[i].bounds), 200, 0, 3);
 
 			double circle = (double)cv::countNonZero(bhi(mr[i].bounds)) / mr[i].bounds.area();
@@ -144,6 +146,12 @@ void DetectSign2::ident(cv::Mat &rhi, cv::Mat &bhi, std::vector<MatRect> &mr) {
 					bottom(mr[i].bounds.x + (mr[i].bounds.width / 3), mr[i].bounds.y + (mr[i].bounds.width * 4 / 5), mr[i].bounds.width / 3, (mr[i].bounds.height / 5) - 5);
 
 				int __res__ = SIGN_LEFT;
+
+				fix(left, bhi.cols, bhi.rows);
+				fix(right, bhi.cols, bhi.rows);
+				fix(bottom, bhi.cols, bhi.rows);
+
+				std::cout << "Source: " << bhi.cols << "x" << bhi.rows << "; Left: " << left << "; Right: " << right << "; Bottom: " << bottom << ";" << std::endl;
 				int right_c = cv::countNonZero(bhi(left));
 				int left_c = cv::countNonZero(bhi(right));
 				int forward_c = cv::countNonZero(bhi(bottom));
@@ -159,6 +167,13 @@ void DetectSign2::ident(cv::Mat &rhi, cv::Mat &bhi, std::vector<MatRect> &mr) {
 			}
 		}
 	}
+}
+
+void DetectSign2::fix(cv::Rect &r, int cols, int rows) {
+	if (r.x < 0) r.x = 0;
+	if (r.y < 0) r.y = 0;
+	if (r.x + r.width > cols) { r.x = cols; r.width = 0; }
+	if (r.y + r.height > rows) { r.y = rows; r.height = 0; }
 }
 
 void DetectSign2::detectRed(cv::Mat &hsvi, cv::Mat &hi, std::vector<MatRect> &out) {

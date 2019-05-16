@@ -4,7 +4,6 @@
 #include "opencv2/opencv.hpp"
 #include "Magu.h"
 #include <atomic>
-#include <mutex>
 
 class DetectSign2 {
 #define SIGN_NOT_DEFINED 0
@@ -47,8 +46,8 @@ public:
 	};
 
 private:
-	std::mutex mtx;
 	cv::Mat src;
+	void fix(cv::Rect &,int, int);
 	void ident(cv::Mat &, cv::Mat &, std::vector<MatRect> &);
 	void detectRed(cv::Mat &, cv::Mat &, std::vector<MatRect> &);
 	void detectBlue(cv::Mat &, cv::Mat &, std::vector<MatRect> &);
