@@ -7,7 +7,6 @@
 #include <iostream>
 #include <atomic>
 #include <unistd.h>
-#include <mutex>
 #include "Magu.h"
 
 using namespace std;
@@ -20,9 +19,8 @@ public:
 
 	}
 
-	void trace(std::atomic<int> &, std::atomic<int> &, MAGU &);
+	void trace(std::atomic<int> &, std::atomic<int> &, std::atomic<int> &, MAGU &);
 private:
-	mutex mtx;
 	int even = 0;
 	int L[2] = { 1, 1 };
 	int R[2] = { 1, 1 };

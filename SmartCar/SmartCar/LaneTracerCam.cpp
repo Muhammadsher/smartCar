@@ -1,69 +1,70 @@
 #include "LaneTracerCam.h"
 
 
-void LaneTracerCam::trace(atomic<int> &left, atomic<int> &right, MAGU &magu) {
-	//traceBit = false;
-	//std::lock_guard<std::mutex> lock(mtx);
-	Mat frame, whiteLane, yellowLane, LinesImg, HSV_Img;
-	//frame = f.clone();
-	//raspicam::RaspiCam_Cv camera;
-	//camera.open();
+void LaneTracerCam::trace(atomic<int> &left, atomic<int> &right, std::atomic<int> &crosswalk, MAGU &magu) {
 
-	//sleep(3);
+	Mat frame, whiteLane, yellowLane, LinesImg, yellowLane_, HSV_Img;
 
 	while (true)
 	{
-		//camera.grab();
-		//camera.retrieve(frame);
-
 		frame = magu.getImage();
 
 		//cout << "Lane tracer got image" << endl;
 
-		frame = frame(Rect(0, 2 * (frame.rows / 3), frame.cols, frame.rows / 3));
-
-
-		//resize image
-		//resize(frame, frame, Size(640, 480));
-
+		frame = frame(Rect(0, frame.rows / 2, frame.cols, frame.rows / 2));
 
 		//here we define our region of interest
-		//box(x, y, b, c); //100, 295, 400, 185
-		Rect box(frame.cols / 4, frame.rows / 2, frame.cols / 2, frame.rows / 2); //this mean the first corner is
-											//(x,y)=(100,295)
-											// and the second corner is
-											//(x + b, y+c )= (100 +400,295+185)
-		Mat ROI = frame(box);
+		Rect const box(frame.cols / 4, frame.rows / 2, frame.cols / 2, frame.rows / 2);
 
+		Mat ROI = frame(box).clone();
+
+		cv::medianBlur(ROI, ROI, 5);
 		// convert our img to HSV Space
-		cvtColor(ROI, HSV_Img, CV_RGB2HSV);
+		cvtColor(ROI, HSV_Img, COLOR_BGR2HSV);
 
-		//white color thresholding
-		Scalar whiteMinScalar = Scalar(90, 0, 236);
-		Scalar whiteMaxScalar = Scalar(111, 93, 255);
+		//white color
+		Scalar whiteMinScalar = Scalar(0, 128, 153);
+		Scalar whiteMaxScalar = Scalar(255, 192, 255);
 		inRange(HSV_Img, whiteMinScalar, whiteMaxScalar, whiteLane);
 
-		//yellow color thresholding
-		Scalar yellowMinScalar = Scalar(81, 119, 200);
-		Scalar yellowMaxScalar = Scalar(101, 255, 255);
+		//yellow color
+		Scalar yellowMinScalar = Scalar(0, 145, 155);
+		Scalar yellowMaxScalar = Scalar(28, 255, 255);
+
+		Scalar yellowMinScalar_ = Scalar(0, 237, 117);
+		Scalar yellowMaxScalar_ = Scalar(255, 255, 255);
 
 		inRange(HSV_Img, yellowMinScalar, yellowMaxScalar, yellowLane);
 
-		//combine our two images in one image
-		addWeighted(whiteLane, 1.0, yellowLane, 1.0, 0.0, LinesImg);
+		inRange(HSV_Img, yellowMinScalar_, yellowMaxScalar_, yellowLane_);
 
+		addWeighted(yellowLane, 1.0, yellowLane_, 1.0, 0.0, yellowLane);
 
-		// Edge detection using canny detector
-		int minCannyThreshold = 190;
-		int maxCannyThreshold = 230;
-		Canny(LinesImg, LinesImg, minCannyThreshold, maxCannyThreshold, 5, true);
+		cv::GaussianBlur(yellowLane, yellowLane, cv::Size(5, 5), 2, 2);
 
-		// Morphological Operation
-		Mat k = getStructuringElement(CV_SHAPE_RECT, Size(9, 9)); //MATLAB :k=Ones(9)
+		Canny(yellowLane, LinesImg, 190, 230, 5, true);
+
+		cv::GaussianBlur(whiteLane, whiteLane, cv::Size(5, 5), 2, 2);
+
+		Mat k = getStructuringElement(CV_SHAPE_RECT, Size(9, 9));
 
 		morphologyEx(LinesImg, LinesImg, MORPH_CLOSE, k);
 
-		// now applying hough transform TO DETECT Lines in our image
+		morphologyEx(whiteLane, whiteLane, MORPH_CLOSE, k);
+
+		std::vector<std::vector<cv::Point>> contours;
+
+		findContours(whiteLane, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+		if (contours.size() == 4) {
+			crosswalk = 1;	// there is a crosswalk
+			cout << "Crosswalk" << endl;
+		}
+		else
+		{
+			crosswalk = 0;
+		}
+
 		vector<Vec4i> lines;
 		double rho = 1;
 		double theta = CV_PI / 180;
@@ -72,8 +73,6 @@ void LaneTracerCam::trace(atomic<int> &left, atomic<int> &right, MAGU &magu) {
 		double maxLineGap = 210;
 
 		HoughLinesP(LinesImg, lines, rho, theta, threshold, minLinLength, maxLineGap);
-
-		//draw our lines
 
 		if (lines.size() == 0)
 		{
@@ -106,34 +105,27 @@ void LaneTracerCam::trace(atomic<int> &left, atomic<int> &right, MAGU &magu) {
 
 		}
 		
-		rectangle(frame, box, Scalar(0, 0, 255), 2);
-		
-		namedWindow("frame");
-		imshow("frame", frame);
-		if (waitKey(20) == 27)
+		if (false)
 		{
-			cout << "Lane Tracing Finished" << endl;
-			//traceBit = true;
-			break;
+			namedWindow("WhiteLane");
+			imshow("WhiteLane", whiteLane);
+
+			namedWindow("YellowLane");
+			imshow("YellowLane", yellowLane);
+
+			namedWindow("frame");
+			imshow("frame", frame);
+
+			namedWindow("ROI");
+			imshow("ROI", ROI);
+			waitKey(1);
+
 		}
-		
-		 
-		namedWindow("WhiteLane");
-		//moveWindow("WhiteLane", 950, 280);
-		imshow("WhiteLane", whiteLane);
-		//  */
-		
-		namedWindow("YellowLane");
-		//moveWindow("YellowLane", 950, 30);
-		imshow("YellowLane", yellowLane);
-		waitKey(1);
-		// */
+
 		if (even) {
 			left = L[0] | L[1];
 			right = R[0] | R[1];
 		}
 		even = !even;
 	}
-		//traceBit = true;
-		//mtx.unlock();
 }

@@ -1,7 +1,7 @@
 #ifndef Motor_h
 #define Motor_h
 
-#define MAX_SPEED 40
+#define MAX_SPEED 60
 #define MIN_SPEED 5		// MIN_SPEED = 6 * MIN_SPEED;
 #define IN1_PIN 1
 #define IN2_PIN 4

@@ -5,6 +5,7 @@ MAGU::MAGU()
 	if (!camera.open()) {
 		cerr << "Error opening camera" << endl;
 	}
+
 	sleep(3);
 }
 
@@ -18,8 +19,7 @@ Mat MAGU::getImage() {
 	lock_guard<std::mutex> lg(mtxCamera);
 	camera.grab();
 	camera.retrieve(frame);
-	imshow("video", frame);
-	waitKey(1);
+
 	return frame;
 }
 
