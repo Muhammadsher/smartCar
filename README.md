@@ -1,4 +1,4 @@
 # smartCar
 Self driving car
 
-See [Software Specification](https://github.com/Muhammadsher/smartCar/blob/master/MAGU_Software_Design_Specification.docx)
+See [Software Specification](https://github.com/Muhammadsher/smartCar/raw/master/MAGU_Software_Design_Specification.docx)
