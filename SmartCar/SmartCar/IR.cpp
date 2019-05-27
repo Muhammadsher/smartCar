@@ -1,11 +1,4 @@
 #include "IR.h"
-#include <iostream>
-#include <wiringPi.h>
-
-#define RIGHT 26
-#define LEFT 27
-
-using namespace std;
 
 int IR::setUp() {
 	pinMode(RIGHT, INPUT);

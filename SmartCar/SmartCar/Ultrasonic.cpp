@@ -1,11 +1,4 @@
 #include "Ultrasonic.h"
-#include <iostream>
-#include <wiringPi.h>
-
-#define TRIG_PIN 28
-#define ECHO_PIN 29
-
-using namespace std;
 
 int Ultrasonic::setUp() {
 
@@ -15,36 +8,28 @@ int Ultrasonic::setUp() {
 	return 0;
 }
 
-int Ultrasonic::getDistance()
+void Ultrasonic::getDistance(atomic<bool> &stopBit)
 {
-	int start_time = 0, end_time = 0;
-	float distance = 0;
+	setUp();
 
-	digitalWrite(TRIG_PIN, LOW);
-	delay(500);
-	digitalWrite(TRIG_PIN, HIGH);
-	delayMicroseconds(10);
-	digitalWrite(TRIG_PIN, LOW);
+	while (1) {
+		int start_time = 0, end_time = 0;
+		float distance = 0;
 
-	while (digitalRead(ECHO_PIN) == 0);
-	start_time = micros();
+		digitalWrite(TRIG_PIN, LOW);
+		delay(500);
+		digitalWrite(TRIG_PIN, HIGH);
+		delayMicroseconds(10);
+		digitalWrite(TRIG_PIN, LOW);
 
-	while (digitalRead(ECHO_PIN) == 1);
-	end_time = micros();
+		while (digitalRead(ECHO_PIN) == 0);
+		start_time = micros();
 
-	distance = (end_time - start_time) / 29. / 2.;
-	return (int)distance;
-}
+		while (digitalRead(ECHO_PIN) == 1);
+		end_time = micros();
 
-bool Ultrasonic::start() {
-	int distance = getDistance();
+		distance = (end_time - start_time) / 29. / 2.;
 
-	if (distance <= 40)
-	{
-		return false;
-	}
-	else 
-	{
-		return true;
+		stopBit = (distance > 10);
 	}
 }

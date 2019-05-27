@@ -1,13 +1,16 @@
-#ifndef DetectSign_H
-#define DetectSign_H
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/objdetect.hpp>
-#include <opencv2/core.hpp>
-#include "opencv2/opencv.hpp" 
-#include <cmath>
+#ifndef DetectSign2_H
+#define DetectSign2_H
 
-class DS {
+#include "opencv2/opencv.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui.hpp"
+#include <atomic>
+#include "Magu.h"
+#include <math.h>
+#include <thread>
+
+
+class DetectSign2 {
 #define SIGN_NOT_DEFINED 0
 #define SIGN_CIRCLE 1
 #define SIGN_LEFT 2
@@ -16,21 +19,65 @@ class DS {
 #define SIGN_STOP 5
 #define SIGN_PEDESTRIAN 6
 #define SIGN_PARKING 7
+#define NO_ROAD 8
+#define TRAFIC_CONTROL_RED 9
+
+
+#define M_PI 3.14159265358979323846
 public:
-	DS();
-	int detect(cv::Mat &);
-	char * readable(int);
-	void Erosion(cv::Mat &, int, int);
-	void Dilation(cv::Mat &, int, int);
-	int trafficControl(cv::Mat &);
+	DetectSign2();
+	void detect(MAGU &, std::atomic<int> &, bool);
+	std::string readable(int);
+
+	struct MatRect
+	{
+		int Result = SIGN_NOT_DEFINED;
+
+		cv::Rect bounds;
+
+		bool isRed = false;
+		bool isOctal = false;
+		bool isTriangle = false;
+
+		bool isBlue = false;
+		bool isCircle = false;
+		bool isRect = false;
+
+		bool operator<(const MatRect& a) const
+		{
+			return bounds.area() < a.bounds.area();
+		}
+
+		bool operator>(const MatRect& a) const
+		{
+			return bounds.area() > a.bounds.area();
+		}
+	};
 
 private:
-	cv::CascadeClassifier cascade_circle, cascade_left, cascade_right, cascade_forward, cascade_stop, cascade_parking, cascade_pedestrian;
-	std::vector<cv::Rect> res_cas_circle, res_cas_left, res_cas_right, res_cas_forward, res_cas_stop, res_cas_parking, res_cas_pedestrian;
+	cv::Mat src;
 
-	double angle(cv::Point, cv::Point, cv::Point);
-	cv::Mat CropImage(cv::Mat &, const std::vector<cv::Point> &);
-	int recog(cv::Mat &, size_t);
+	cv::CascadeClassifier cascade_obstacle, cascade_left,
+		cascade_right, cascade_stop,
+		cascade_parking, cascade_pedestrian;
+
+	cv::Scalar Range_red_upper, Range_red_lower,
+		Range_red_upper2, Range_red_lower2,
+		Range_blue_upper, Range_blue_lower,
+		Range_blue_upper2, Range_blue_lower2,
+		Range_yellow_upper, Range_yellow_lower,
+		Range_darkgreen_upper, Range_darkgreen_lower,
+		Range_tc_upper, Range_tc_lower,
+		Range_white_upper, Range_white_lower;
+	
+	int MedianBlurSize;
+	std::string print(MatRect &);
+
+	void fix(cv::Rect &, int, int);
+	void ident(cv::Mat &, std::vector<cv::Mat> &, std::vector<MatRect> &);
+	void detectTC(cv::Mat &, cv::Mat &, cv::Mat &, std::vector<MatRect> &);
+	void detectRed(cv::Mat &, cv::Mat &, cv::Mat &, std::vector<MatRect> &);
+	void detectBlue(cv::Mat &, cv::Mat &, cv::Mat &, std::vector<MatRect> &);
 };
 
 #endif
